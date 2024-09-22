@@ -68,4 +68,10 @@ public class AccountController {
 
         return ResponseEntity.badRequest().build();
     }
+
+    @PostMapping("/reset")
+    public ResponseEntity<?> reset() {
+        accountUseCase.reset();
+        return ResponseEntity.ok().build();
+    }
 }

@@ -48,4 +48,8 @@ public class AccountUseCase {
 
         return Map.of("origin", origin, "destination", destination);
     }
+
+    public void reset() {
+        accountGateway.reset();
+    }
 }
