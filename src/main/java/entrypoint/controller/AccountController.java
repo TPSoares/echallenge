@@ -9,9 +9,11 @@ import entrypoint.dto.TransferResponse;
 import entrypoint.dto.WithdrawResponse;
 import entrypoint.enums.TransactionType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,6 +25,16 @@ public class AccountController {
     public AccountController(AccountUseCase accountUseCase) {
         this.accountUseCase = accountUseCase;
     }
+
+    @GetMapping("/balance")
+    public BalanceResponse getBalance(@RequestParam String account_id) {
+        AccountDomain account = accountUseCase.getAccountBalance(account_id);
+
+        return BalanceResponse.builder()
+                .balance(account.getBalance())
+                .build();
+    }
+
 
     @PostMapping
     public ResponseEntity<?> handleEvent(@RequestBody EventRequest request) {

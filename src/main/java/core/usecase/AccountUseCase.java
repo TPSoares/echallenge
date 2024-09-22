@@ -16,6 +16,16 @@ public class AccountUseCase {
         this.accountGateway = accountGateway;
     }
 
+    public AccountDomain getAccountBalance(String accountId) {
+        AccountEntity account = accountGateway.findById(accountId)
+                .orElseThrow(AccountNotFoundException::new);
+
+        return AccountDomain.builder()
+                .id(account.getId())
+                .balance(account.getBalance())
+                .build();
+    }
+
     public AccountDomain deposit(String accountId, Integer amount) {
         AccountEntity account = accountGateway.findById(accountId)
                 .orElseGet(() -> new AccountEntity(accountId, 0));
