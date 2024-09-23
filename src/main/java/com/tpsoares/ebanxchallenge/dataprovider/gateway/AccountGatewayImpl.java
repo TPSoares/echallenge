@@ -15,18 +15,24 @@ public class AccountGatewayImpl implements AccountGateway {
 
     @Override
     public Optional<AccountEntity> findById(String id) {
+        if (id == null) {
+            return Optional.empty();
+        }
         return Optional.ofNullable(accountStore.get(id));
     }
 
     @Override
     public AccountEntity save(AccountEntity account) {
+        if (account == null || account.getId() == null) {
+            throw new IllegalArgumentException();
+        }
         accountStore.put(account.getId(), account);
         return account;
     }
 
     @Override
     public void reset() {
-        accountStore.clear(); // Clear all data for /reset endpoint
+        accountStore.clear();
     }
 }
 

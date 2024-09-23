@@ -8,82 +8,107 @@ import com.tpsoares.ebanxchallenge.entrypoint.dto.EventRequest;
 import com.tpsoares.ebanxchallenge.entrypoint.dto.TransferResponse;
 import com.tpsoares.ebanxchallenge.entrypoint.dto.WithdrawResponse;
 import com.tpsoares.ebanxchallenge.entrypoint.enums.TransactionType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/")
 public class AccountController {
 
-    AccountUseCase accountUseCase;
+    private final AccountUseCase accountUseCase;
 
     public AccountController(AccountUseCase accountUseCase) {
         this.accountUseCase = accountUseCase;
     }
 
     @GetMapping("/balance")
-    public BalanceResponse getBalance(@RequestParam String account_id) {
-        AccountDomain account = accountUseCase.getAccountBalance(account_id);
-
-        return BalanceResponse.builder()
-                .balance(account.getBalance())
-                .build();
+    public ResponseEntity<Integer> getBalance(@RequestParam String account_id) {
+        return accountUseCase.getAccountBalance(account_id)
+                .map(account -> ResponseEntity.ok(account.getBalance()))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(0));
     }
-
 
     @PostMapping("/event")
     public ResponseEntity<?> handleEvent(@RequestBody EventRequest request) {
-
         TransactionType transactionType = TransactionType.fromString(request.getType());
 
-        if (transactionType == TransactionType.DEPOSIT) {
-            AccountDomain account = accountUseCase.deposit(request.getOrigin(), request.getAmount());
-            return ResponseEntity.ok(DepositResponse.builder()
-                    .destination(
-                            BalanceResponse.builder()
-                                    .id(account.getId())
-                                    .balance(account.getBalance())
-                                    .build())
-                    .build()
-            );
-        } else if (transactionType == TransactionType.WITHDRAW) {
-            AccountDomain account = accountUseCase.withdraw(request.getOrigin(), request.getAmount());
-            return ResponseEntity.ok(WithdrawResponse.builder()
-                    .origin(
-                            BalanceResponse.builder()
-                                    .id(account.getId())
-                                    .balance(account.getBalance())
-                                    .build())
-                    .build()
-            );
-        } else if (transactionType == TransactionType.TRANSFER) {
-            var accounts = accountUseCase.transfer(request.getOrigin(), request.getDestination(), request.getAmount());
-            return ResponseEntity.ok(TransferResponse.builder()
-                    .origin(
-                            BalanceResponse.builder()
-                                    .id(accounts.get("origin").getId())
-                                    .balance(accounts.get("origin").getBalance())
-                                    .build())
-                    .destination(
-                            BalanceResponse.builder()
-                                    .id(accounts.get("destination").getId())
-                                    .balance(accounts.get("destination").getBalance())
-                                    .build())
-                    .build()
-            );
+        switch (transactionType) {
+            case DEPOSIT:
+                return handleDeposit(request.getDestination(), request.getAmount());
+            case WITHDRAW:
+                return handleWithdraw(request.getOrigin(), request.getAmount());
+            case TRANSFER:
+                return handleTransfer(request.getOrigin(), request.getDestination(), request.getAmount());
+            default:
+                return ResponseEntity.badRequest().body("Invalid transaction type");
+        }
+    }
+
+    private ResponseEntity<?> handleDeposit(String destinationId, Integer amount) {
+        Optional<AccountDomain> account = accountUseCase.deposit(destinationId, amount);
+
+        if (account.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
         }
 
-        return ResponseEntity.badRequest().build();
+        DepositResponse depositResponse = DepositResponse.builder()
+                .destination(BalanceResponse.builder()
+                        .id(account.get().getId())
+                        .balance(account.get().getBalance())
+                        .build())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(depositResponse);
+    }
+
+    private ResponseEntity<?> handleWithdraw(String originId, Integer amount) {
+        Optional<AccountDomain> account = accountUseCase.withdraw(originId, amount);
+
+        if (account.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
+        }
+
+        WithdrawResponse withdrawResponse = WithdrawResponse.builder()
+                .origin(BalanceResponse.builder()
+                        .id(account.get().getId())
+                        .balance(account.get().getBalance())
+                        .build())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(withdrawResponse);
+    }
+
+    private ResponseEntity<?> handleTransfer(String originId, String destinationId, Integer amount) {
+        var accounts = accountUseCase.transfer(originId, destinationId, amount);
+
+        if (accounts.values().stream().anyMatch(Optional::isEmpty)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0);
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(TransferResponse.builder()
+                        .origin(getBalanceResponse(accounts.get("origin")))
+                        .destination(getBalanceResponse(accounts.get("destination")))
+                        .build());
+    }
+
+    private BalanceResponse getBalanceResponse(Optional<AccountDomain> accountOpt) {
+        return accountOpt.map(account -> BalanceResponse.builder()
+                        .id(account.getId())
+                        .balance(account.getBalance())
+                        .build())
+                .orElse(BalanceResponse.builder()
+                        .id("unknown")
+                        .balance(0)
+                        .build());
     }
 
     @PostMapping("/reset")
-    public ResponseEntity<?> reset() {
+    public ResponseEntity<String> reset() {
         accountUseCase.reset();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("OK");
     }
 }
