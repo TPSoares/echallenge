@@ -1,4 +1,4 @@
-package entrypoint.dto;
+package com.tpsoares.ebanxchallenge.entrypoint.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WithdrawResponse {
-    private BalanceResponse origin;
+public class BalanceResponse {
+    private String id;
+    private Integer balance;
 }
+

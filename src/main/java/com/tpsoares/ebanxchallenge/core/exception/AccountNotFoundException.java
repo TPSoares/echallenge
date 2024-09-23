@@ -1,4 +1,4 @@
-package core.exception;
+package com.tpsoares.ebanxchallenge.core.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

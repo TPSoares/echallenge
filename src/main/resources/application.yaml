@@ -1,0 +1,7 @@
+spring:
+    application:
+        name: Ebanx challenge
+logging:
+    level:
+        org:
+            springframework: INFO

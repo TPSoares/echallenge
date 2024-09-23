@@ -1,9 +1,9 @@
-package core.usecase;
+package com.tpsoares.ebanxchallenge.core.usecase;
 
-import core.domain.AccountDomain;
-import core.exception.AccountNotFoundException;
-import core.gateway.AccountGateway;
-import dataprovider.entity.AccountEntity;
+import com.tpsoares.ebanxchallenge.core.exception.AccountNotFoundException;
+import com.tpsoares.ebanxchallenge.core.gateway.AccountGateway;
+import com.tpsoares.ebanxchallenge.dataprovider.entity.AccountEntity;
+import com.tpsoares.ebanxchallenge.core.domain.AccountDomain;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -28,7 +28,11 @@ public class AccountUseCase {
 
     public AccountDomain deposit(String accountId, Integer amount) {
         AccountEntity account = accountGateway.findById(accountId)
-                .orElseGet(() -> new AccountEntity(accountId, 0));
+                .orElseGet(() -> AccountEntity.builder()
+                                .id(accountId)
+                                .balance(amount)
+                                .build()
+                );
 
         account.setBalance(account.getBalance() + amount);
         accountGateway.save(account);

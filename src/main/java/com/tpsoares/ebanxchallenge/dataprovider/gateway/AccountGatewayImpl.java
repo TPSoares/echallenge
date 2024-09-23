@@ -1,7 +1,7 @@
-package dataprovider.gateway;
+package com.tpsoares.ebanxchallenge.dataprovider.gateway;
 
-import core.gateway.AccountGateway;
-import dataprovider.entity.AccountEntity;
+import com.tpsoares.ebanxchallenge.core.gateway.AccountGateway;
+import com.tpsoares.ebanxchallenge.dataprovider.entity.AccountEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;

@@ -1,13 +1,13 @@
-package entrypoint.controller;
+package com.tpsoares.ebanxchallenge.entrypoint.controller;
 
-import core.domain.AccountDomain;
-import core.usecase.AccountUseCase;
-import entrypoint.dto.BalanceResponse;
-import entrypoint.dto.DepositResponse;
-import entrypoint.dto.EventRequest;
-import entrypoint.dto.TransferResponse;
-import entrypoint.dto.WithdrawResponse;
-import entrypoint.enums.TransactionType;
+import com.tpsoares.ebanxchallenge.core.domain.AccountDomain;
+import com.tpsoares.ebanxchallenge.core.usecase.AccountUseCase;
+import com.tpsoares.ebanxchallenge.entrypoint.dto.BalanceResponse;
+import com.tpsoares.ebanxchallenge.entrypoint.dto.DepositResponse;
+import com.tpsoares.ebanxchallenge.entrypoint.dto.EventRequest;
+import com.tpsoares.ebanxchallenge.entrypoint.dto.TransferResponse;
+import com.tpsoares.ebanxchallenge.entrypoint.dto.WithdrawResponse;
+import com.tpsoares.ebanxchallenge.entrypoint.enums.TransactionType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/event")
+@RequestMapping("/")
 public class AccountController {
 
     AccountUseCase accountUseCase;
@@ -36,7 +36,7 @@ public class AccountController {
     }
 
 
-    @PostMapping
+    @PostMapping("/event")
     public ResponseEntity<?> handleEvent(@RequestBody EventRequest request) {
 
         TransactionType transactionType = TransactionType.fromString(request.getType());

@@ -1,4 +1,4 @@
-package entrypoint.dto;
+package com.tpsoares.ebanxchallenge.entrypoint.dto;
 
 import lombok.Data;
 

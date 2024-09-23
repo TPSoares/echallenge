@@ -1,6 +1,6 @@
-package core.gateway;
+package com.tpsoares.ebanxchallenge.core.gateway;
 
-import dataprovider.entity.AccountEntity;
+import com.tpsoares.ebanxchallenge.dataprovider.entity.AccountEntity;
 
 import java.util.Optional;
 

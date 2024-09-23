@@ -1,15 +1,13 @@
-package core.domain;
+package com.tpsoares.ebanxchallenge.dataprovider.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class AccountDomain {
+public class AccountEntity {
     private String id;
     private Integer balance;
 }

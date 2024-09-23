@@ -1,4 +1,4 @@
-package entrypoint.enums;
+package com.tpsoares.ebanxchallenge.entrypoint.enums;
 
 public enum TransactionType {
     DEPOSIT("deposit"),
